@@ -26,7 +26,6 @@ print("\nNumber of Duplicate Rows:", df.duplicated().sum())
 # %% Các biểu đồ 
 plot_close_price_histogram(df, bins=30) #Biểu đồ histogram
 plot_close_prices(df) #Biểu đồ giá đóng cửa theo thời gian
-plot_average_close_by_month(df) #Biểu đồ trung bình giá đóng cửa theo tháng
 
 # %% 
 df_close_log = np.log(df['Close'])

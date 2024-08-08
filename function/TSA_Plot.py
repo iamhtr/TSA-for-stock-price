@@ -3,17 +3,6 @@ import pandas as pd
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 # Vẽ biểu đồ cho các kiểm tra trước khi huấn luyện mô hình
-def plot_average_close_by_month(df):
-    plt.figure(figsize=(10, 6))
-    df['Month'] = df.index.month
-    df.groupby('Month')['Close'].mean().plot(kind='bar', color='blue')
-    plt.title('Average Close Prices by Month')
-    plt.xlabel('Month')
-    plt.ylabel('Average Close Price')
-    plt.xticks(rotation=0)
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    plt.show()
-
 def plot_close_prices(df):
     plt.figure(figsize=(12, 6))
     plt.plot(df['Close'], color='blue')
