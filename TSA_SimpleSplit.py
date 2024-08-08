@@ -99,6 +99,7 @@ plot_arima_pred(train_data, test_data, fc_series_arima, lower_series_arima, uppe
 fitted_sarima = fit_sarima_model(train_data, seasonal_period=12)
 fc_series_sarima, lower_series_sarima, upper_series_sarima = predict_sarima_model(fitted_sarima, test_data)
 evaluate_sarima = evaluate_sarima_model(test_data, fc_series_sarima)
+
 plot_sarima_pred(train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima)
 
 # %% Holt-Winters Model
@@ -107,6 +108,26 @@ hw_forecast_series = predict_hw_model(fitted_hw, test_data)
 evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
 plot_hw_pred(train_data, test_data, hw_forecast_series)
 
+# %%
+print("AR Model Evaluation:")
+print(f"  - MSE:  {evaluate_ar['mse']:.4f}")
+print(f"  - RMSE: {evaluate_ar['rmse']:.4f}")
+
+print("ARMA Model Evaluation:")
+print(f"  - MSE:  {evaluate_arma['mse']:.4f}")
+print(f"  - RMSE: {evaluate_arma['rmse']:.4f}")
+
+print("ARIMA Model Evaluation:")
+print(f"  - MSE:  {evaluate_arima['mse']:.4f}")
+print(f"  - RMSE: {evaluate_arima['rmse']:.4f}")
+
+print("SARIMA Model Evaluation:")
+print(f"  - MSE:  {evaluate_sarima['mse']:.4f}")
+print(f"  - RMSE: {evaluate_sarima['rmse']:.4f}")
+
+print("Holt-Winters Model Evaluation:")
+print(f"  - MSE:  {evaluate_hw['mse']:.4f}")
+print(f"  - RMSE: {evaluate_hw['rmse']:.4f}")
 # %%
 save_model(model_ar, 'AR')
 save_model(model_arma, 'ARMA')
