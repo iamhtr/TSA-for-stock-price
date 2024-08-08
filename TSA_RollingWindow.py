@@ -96,6 +96,7 @@ for i in range(5):
     model_ar = fit_ar_model(train_data, max_lag=5, criterion='aic')
     pred_ar = predict_ar_model(model_ar, train_data, test_data)
     evaluate_ar = evaluate_ar_model(test_data, pred_ar)
+    plot_rolling_ar_pred(df_close_log, train_data, test_data, pred_ar, i)
     
     # Huấn luyện mô hình ARMA
     p = find_optimal_p(train_data, 5)
@@ -103,21 +104,25 @@ for i in range(5):
     model_arma = fit_arma_model(train_data, p, q)
     fc_series_arma, lower_series_arma, upper_series_arma = predict_arma_model(model_arma, test_data)
     evaluate_arma = evaluate_arma_model(test_data, fc_series_arma)
-    
+    plot_rolling_arma_pred(df_close_log, train_data, test_data, fc_series_arma, lower_series_arma, upper_series_arma, i)
+
     # Huấn luyện mô hình ARIMA
     fitted_arima, order_arima = fit_arima_model(train_data)
     fc_series_arima, lower_series_arima, upper_series_arima = forecast_arima_model(fitted_arima, test_data)
     evaluate_arima = evaluate_arima_model(test_data, fc_series_arima)
+    plot_rolling_arima_pred(df_close_log, train_data, test_data, fc_series_arima, lower_series_arima, upper_series_arima, i)
     
     # Huấn luyện mô hình SARIMA
     fitted_sarima = fit_sarima_model(train_data, seasonal_period=12)
     fc_series_sarima, lower_series_sarima, upper_series_sarima = predict_sarima_model(fitted_sarima, test_data)
     evaluate_sarima = evaluate_sarima_model(test_data, fc_series_sarima)
+    plot_rolling_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
     
     # Huấn luyện mô hình Holt-Winters
     fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
     hw_forecast_series = predict_hw_model(fitted_hw, test_data)
     evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
+    plot_rolling_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
     
     # Tính toán các chỉ số đánh giá
     mse_ar = evaluate_ar['mse']
@@ -144,13 +149,6 @@ for i in range(5):
         best_mse = mse_arima
         best_window_index = i
 
-    # Hiển thị kết quả dự đoán và biểu đồ cho từng mô hình
-    plot_rolling_ar_pred(df_close_log, train_data, test_data, pred_ar, i)
-    plot_rolling_arma_pred(df_close_log, train_data, test_data, fc_series_arma, lower_series_arma, upper_series_arma, i)
-    plot_rolling_arima_pred(df_close_log, train_data, test_data, fc_series_arima, lower_series_arima, upper_series_arima, i)
-    plot_rolling_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
-    plot_rolling_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
-
     #Save model
     roll_save_model(model_ar, 'AR', i)
     roll_save_model(model_arma, 'ARMA', i)
@@ -158,7 +156,7 @@ for i in range(5):
     roll_save_model(fitted_sarima, 'SARIMA', i)
     roll_save_model(fitted_hw, 'Holt-Winters', i)
 # %% In kết quả của từng cửa sổ
-print("\nEvaluation Metrics for Each Window:")
+print("\nEvaluation Metrics for Each Window in Rolling Window:")
 for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"Window {i+1}:")
     print(f"  AR MSE: {mse[0]}, RMSE: {rmse[0]}")
@@ -168,3 +166,4 @@ for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
 
 print(f"\nBest Window: {best_window_index + 1} with ARIMA MSE: {best_mse}")
+# %%

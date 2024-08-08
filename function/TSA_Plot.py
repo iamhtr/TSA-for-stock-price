@@ -106,10 +106,10 @@ def plot_hw_pred(train_data, test_data, hw_forecast_series):
 # Vẽ biểu đồ cho Rolling Window
 def plot_rolling_ar_pred(df_close_log, train_data, test_data, pred_ar, fold):
     plt.figure(figsize=(12, 6))
-    plt.plot(df_close_log, color="black", label="Dữ liệu thực tế")
-    plt.plot(train_data.index, train_data, color="blue", label="Tập huấn luyện")
-    plt.plot(test_data.index, test_data, color="orange", label="Dữ liệu kiểm thử")
-    plt.plot(test_data.index, pred_ar, color="red", label="Dự đoán AR")
+    plt.plot(df_close_log, color="black", label="Actual Data")
+    plt.plot(train_data.index, train_data, color="blue", label="Train Data")
+    plt.plot(test_data.index, test_data, color="orange", label="Test Data")
+    plt.plot(test_data.index, pred_ar, color="red", label="AR Prediction")
     plt.title(f"AR Model Rolling Window {fold + 1}")
     plt.xlabel("Thời gian")
     plt.ylabel("Giá")
