@@ -51,7 +51,11 @@ acf(df_close_log)
 
 # %% Chuyển đổi dữ liệu thành chuỗi dừng
 diff = df_close_log.diff(1).dropna()
-plot_log_close_prices(df_close_log)
+
+fig, ax = plt.subplots(2, sharex="all")
+df_close_log.plot(ax=ax[0], title="Giá đóng cửa")
+diff.plot(ax=ax[1], title="Sai phân bậc nhất")
+plt.show() 
 
 # %% Kiểm tra lại tính dừng của dữ liệu sau khi sai phân
 print(adf_test(diff))
@@ -89,7 +93,7 @@ for i in range(5):
     print("TEST: ", test_data)
 
     # Huấn luyện mô hình AR
-    model_ar = fit_ar_model(train_data, max_lag=10, criterion='aic')
+    model_ar = fit_ar_model(train_data, max_lag=5, criterion='aic')
     pred_ar = predict_ar_model(model_ar, train_data, test_data)
     evaluate_ar = evaluate_ar_model(test_data, pred_ar)
     
@@ -164,4 +168,3 @@ for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
 
 print(f"\nBest Window: {best_window_index + 1} with ARIMA MSE: {best_mse}")
-

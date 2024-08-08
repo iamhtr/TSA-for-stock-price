@@ -51,7 +51,11 @@ acf(df_close_log)
 
 #%% Chuyển đổi dữ liệu thành chuỗi dừng
 diff = df_close_log.diff(1).dropna()
-plot_log_close_prices(df_close_log)
+
+fig, ax = plt.subplots(2, sharex="all")
+df_close_log.plot(ax=ax[0], title="Giá đóng cửa")
+diff.plot(ax=ax[1], title="Sai phân bậc nhất")
+plt.show() 
 
 # %% Kiểm tra lại tính dừng của dữ liệu sau khi sai phân
 print(adf_test(diff))
