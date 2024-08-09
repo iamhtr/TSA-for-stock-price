@@ -66,14 +66,82 @@ print(kpss_test(diff))
 pacf(diff)
 acf(diff)
 
-# %% Chia dữ liệu 
-tscv = TimeSeriesSplit(n_splits=5)
+# %%
+def calculate_mean_metrics(mse_list, rmse_list):
+    mean_mse = np.mean(mse_list, axis=0)
+    mean_rmse = np.mean(rmse_list, axis=0)
+    return mean_mse, mean_rmse
 
-# Lưu trữ các chỉ số đánh giá
-mse_list = []
-rmse_list = []
-best_window_index = 0
-best_mse = float('inf')
+mean_mse_list = []
+mean_rmse_list = []
+
+for n_splits in range(2, 11):
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+
+    mse_list = []
+    rmse_list = []
+
+    for train_index, test_index in tscv.split(df_close_log):
+        train_data, test_data = df_close_log.iloc[train_index], df_close_log.iloc[test_index]
+
+        # Huấn luyện mô hình AR
+        model_ar = fit_ar_model(train_data, max_lag=5, criterion='aic')
+        pred_ar = predict_ar_model(model_ar, train_data, test_data)
+        evaluate_ar = evaluate_ar_model(test_data, pred_ar)
+
+        # Huấn luyện mô hình ARMA
+        p = find_optimal_p(train_data, 5)
+        q = find_optimal_q(train_data, 5)
+        model_arma = fit_arma_model(train_data, p, q)
+        fc_series_arma, lower_series_arma, upper_series_arma = predict_arma_model(model_arma, test_data)
+        evaluate_arma = evaluate_arma_model(test_data, fc_series_arma)
+
+        # Huấn luyện mô hình ARIMA
+        fitted_arima, order_arima = fit_arima_model(train_data)
+        fc_series_arima, lower_series_arima, upper_series_arima = forecast_arima_model(fitted_arima, test_data)
+        evaluate_arima = evaluate_arima_model(test_data, fc_series_arima)
+
+        # Huấn luyện mô hình SARIMA
+        fitted_sarima = fit_sarima_model(train_data, seasonal_period=12)
+        fc_series_sarima, lower_series_sarima, upper_series_sarima = predict_sarima_model(fitted_sarima, test_data)
+        evaluate_sarima = evaluate_sarima_model(test_data, fc_series_sarima)
+
+        # Huấn luyện mô hình Holt-Winters
+        fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
+        hw_forecast_series = predict_hw_model(fitted_hw, test_data)
+        evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
+
+        # Tính toán các chỉ số đánh giá
+        mse_ar = evaluate_ar['mse']
+        rmse_ar = evaluate_ar['rmse']
+
+        mse_arma = evaluate_arma['mse']
+        rmse_arma = evaluate_arma['rmse']
+
+        mse_arima = evaluate_arima['mse']
+        rmse_arima = evaluate_arima['rmse']
+
+        mse_sarima = evaluate_sarima['mse']
+        rmse_sarima = evaluate_sarima['rmse']
+
+        mse_hw = evaluate_hw['mse']
+        rmse_hw = evaluate_hw['rmse']
+
+        mse_list.append((mse_ar, mse_arma, mse_arima, mse_sarima, mse_hw))
+        rmse_list.append((rmse_ar, rmse_arma, rmse_arima, rmse_sarima, rmse_hw))
+
+    mean_mse, mean_rmse = calculate_mean_metrics(mse_list, rmse_list)
+    mean_mse_list.append(mean_mse)
+    mean_rmse_list.append(mean_rmse)
+
+#%%
+best_window_index = np.argmin([mean[2] for mean in mean_mse_list])  
+best_n_splits = best_window_index + 2  
+
+print(f"Best number of splits: {best_n_splits}")
+
+# %% Chia dữ liệu 
+tscv = TimeSeriesSplit(n_splits=best_n_splits)
 
 # %% 
 for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
@@ -136,11 +204,6 @@ for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
     mse_list.append((mse_ar, mse_arma, mse_arima, mse_sarima, mse_hw))
     rmse_list.append((rmse_ar, rmse_arma, rmse_arima, rmse_sarima, rmse_hw))
     
-    # So sánh để chọn cửa sổ tốt nhất
-    if mse_arima < best_mse:
-        best_mse = mse_arima
-        best_window_index = i
-
     # Lưu các mô hình
     ex_save_model(model_ar, 'AR', i)
     ex_save_model(model_arma, 'ARMA', i)
@@ -158,6 +221,5 @@ for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"  SARIMA MSE: {mse[3]}, RMSE: {rmse[3]}")
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
 
-print(f"\nBest Window: {best_window_index + 1} with MSE: {best_mse}")
 
 # %%
