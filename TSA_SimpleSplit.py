@@ -103,7 +103,7 @@ evaluate_sarima = evaluate_sarima_model(test_data, fc_series_sarima)
 plot_sarima_pred(train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima)
 
 # %% Holt-Winters Model
-fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
+fitted_hw = fit_hw_model(train_data, trend='add', seasonal= None, seasonal_periods=None)
 hw_forecast_series = predict_hw_model(fitted_hw, test_data)
 evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
 plot_hw_pred(train_data, test_data, hw_forecast_series)

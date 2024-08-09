@@ -73,12 +73,10 @@ step_size = 500
 # 
 mse_list = []
 rmse_list = []
-best_window_index = 0
-best_mse = float('inf')
 
 plot_data_rolling_splits(df_close_log, window_size, test_size, step_size)
 
-# %% Visualize the data splits
+# %%
 #%% 
 for i in range(5):
     train_start = i * step_size
@@ -122,7 +120,7 @@ for i in range(5):
     plot_rolling_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
     
     # Huấn luyện mô hình Holt-Winters
-    fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
+    fitted_hw = fit_hw_model(train_data, trend='add', seasonal=None, seasonal_periods=None)
     hw_forecast_series = predict_hw_model(fitted_hw, test_data)
     evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
     plot_rolling_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
@@ -143,11 +141,10 @@ for i in range(5):
     mse_hw = evaluate_hw['mse']
     rmse_hw = evaluate_hw['rmse']
     
-    # Lưu trữ các chỉ số đánh giá
     mse_list.append((mse_ar, mse_arma, mse_arima, mse_sarima, mse_hw))
     rmse_list.append((rmse_ar, rmse_arma, rmse_arima, rmse_sarima, rmse_hw))
 
-    #Save model
+    # Save model
     roll_save_model(model_ar, 'AR', i)
     roll_save_model(model_arma, 'ARMA', i)
     roll_save_model(fitted_arima, 'ARIMA', i)
@@ -163,4 +160,5 @@ for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"  ARIMA MSE: {mse[2]}, RMSE: {rmse[2]}")
     print(f"  SARIMA MSE: {mse[3]}, RMSE: {rmse[3]}")
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
+    print("------"*10)
 

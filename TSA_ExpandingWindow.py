@@ -142,7 +142,8 @@ print(f"Best number of splits: {best_n_splits}")
 
 # %% Chia dữ liệu 
 tscv = TimeSeriesSplit(n_splits=best_n_splits)
-
+mse_list = []
+rmse_list = []
 # %% 
 for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
     train_data, test_data = df_close_log.iloc[train_index], df_close_log.iloc[test_index]
@@ -179,7 +180,7 @@ for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
     plot_expand_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
     
     # Huấn luyện mô hình Holt-Winters
-    fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
+    fitted_hw = fit_hw_model(train_data, trend='add', seasonal=None, seasonal_periods=None)
     hw_forecast_series = predict_hw_model(fitted_hw, test_data)
     evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
     plot_expand_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
