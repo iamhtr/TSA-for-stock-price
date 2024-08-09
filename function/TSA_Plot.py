@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 # Vẽ biểu đồ cho các kiểm tra trước khi huấn luyện mô hình
@@ -230,3 +231,30 @@ def plot_expand_hw_pred(df_close_log, train_data, test_data, hw_forecast_series,
     plt.ylabel("Price")
     plt.legend(loc="upper left")
     plt.show()
+
+def plot_data_rolling_splits(df, window_size, test_size, step_size, n_splits=5):
+    plt.figure(figsize=(12, 6))
+    colors = ['red', 'green', 'blue', 'orange', 'purple']
+    
+    for i in range(n_splits):
+        train_start = i * step_size
+        train_end = train_start + window_size
+        test_end = train_end + test_size
+
+        if test_end > len(df):
+            break
+
+        train_data = df[train_start:train_end]
+        test_data = df[train_end:test_end]
+        
+        plt.plot(train_data.index, train_data.values, label=f'Window {i + 1} - Train', color=colors[i % len(colors)], linestyle='--')
+        plt.plot(test_data.index, test_data.values, label=f'Window {i + 1} - Test', color=colors[i % len(colors)], linestyle='-')
+    
+    plt.title('Data Split Visualization for Rolling Windows')
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+

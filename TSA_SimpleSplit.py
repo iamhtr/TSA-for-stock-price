@@ -66,7 +66,7 @@ pacf(diff)
 acf(diff)
 
 # %% Chia dữ liệu
-train_data, test_data = df_close_log[:int(len(df_close_log)*0.8)], df_close_log[int(len(df_close_log)*0.8):]
+train_data, test_data = diff[:int(len(df_close_log)*0.8)], df_close_log[int(len(df_close_log)*0.8):]
 plt.figure(figsize=(12, 6))
 plt.plot(train_data, 'blue', label='Train data')
 plt.plot(test_data, 'red', label='Test data')

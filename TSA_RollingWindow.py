@@ -76,6 +76,9 @@ rmse_list = []
 best_window_index = 0
 best_mse = float('inf')
 
+plot_data_rolling_splits(df_close_log, window_size, test_size, step_size)
+
+# %% Visualize the data splits
 #%% 
 for i in range(5):
     train_start = i * step_size
@@ -143,11 +146,6 @@ for i in range(5):
     # Lưu trữ các chỉ số đánh giá
     mse_list.append((mse_ar, mse_arma, mse_arima, mse_sarima, mse_hw))
     rmse_list.append((rmse_ar, rmse_arma, rmse_arima, rmse_sarima, rmse_hw))
-    
-    # So sánh để chọn cửa sổ tốt nhất
-    if mse_arima < best_mse:
-        best_mse = mse_arima
-        best_window_index = i
 
     #Save model
     roll_save_model(model_ar, 'AR', i)
@@ -155,6 +153,7 @@ for i in range(5):
     roll_save_model(fitted_arima, 'ARIMA', i)
     roll_save_model(fitted_sarima, 'SARIMA', i)
     roll_save_model(fitted_hw, 'Holt-Winters', i)
+
 # %% In kết quả của từng cửa sổ
 print("\nEvaluation Metrics for Each Window in Rolling Window:")
 for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
@@ -165,5 +164,3 @@ for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"  SARIMA MSE: {mse[3]}, RMSE: {rmse[3]}")
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
 
-print(f"\nBest Window: {best_window_index + 1} with ARIMA MSE: {best_mse}")
-# %%
