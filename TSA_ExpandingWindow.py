@@ -84,31 +84,37 @@ for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
     print("TEST: ", test_data)
 
     # Huấn luyện mô hình AR
-    model_ar = fit_ar_model(train_data, max_lag=10, criterion='aic')
+    model_ar = fit_ar_model(train_data, max_lag=5, criterion='aic')
     pred_ar = predict_ar_model(model_ar, train_data, test_data)
     evaluate_ar = evaluate_ar_model(test_data, pred_ar)
-    
+    plot_expand_ar_pred(df_close_log, train_data, test_data, pred_ar, i)
+
+
     # Huấn luyện mô hình ARMA
     p = find_optimal_p(train_data, 5)
     q = find_optimal_q(train_data, 5)
     model_arma = fit_arma_model(train_data, p, q)
     fc_series_arma, lower_series_arma, upper_series_arma = predict_arma_model(model_arma, test_data)
     evaluate_arma = evaluate_arma_model(test_data, fc_series_arma)
+    plot_expand_arma_pred(df_close_log, train_data, test_data, fc_series_arma, lower_series_arma, upper_series_arma, i)
     
     # Huấn luyện mô hình ARIMA
     fitted_arima, order_arima = fit_arima_model(train_data)
     fc_series_arima, lower_series_arima, upper_series_arima = forecast_arima_model(fitted_arima, test_data)
     evaluate_arima = evaluate_arima_model(test_data, fc_series_arima)
+    plot_expand_arima_pred(df_close_log, train_data, test_data, fc_series_arima, lower_series_arima, upper_series_arima, i)
     
     # Huấn luyện mô hình SARIMA
     fitted_sarima = fit_sarima_model(train_data, seasonal_period=12)
     fc_series_sarima, lower_series_sarima, upper_series_sarima = predict_sarima_model(fitted_sarima, test_data)
     evaluate_sarima = evaluate_sarima_model(test_data, fc_series_sarima)
+    plot_expand_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
     
     # Huấn luyện mô hình Holt-Winters
     fitted_hw = fit_hw_model(train_data, trend='add', seasonal='add', seasonal_periods=12)
     hw_forecast_series = predict_hw_model(fitted_hw, test_data)
     evaluate_hw = evaluate_hw_model(test_data, hw_forecast_series)
+    plot_expand_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
     
     # Tính toán các chỉ số đánh giá
     mse_ar = evaluate_ar['mse']
@@ -135,13 +141,6 @@ for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
         best_mse = mse_arima
         best_window_index = i
 
-    # Hiển thị kết quả dự đoán và biểu đồ cho từng mô hình
-    plot_expand_ar_pred(df_close_log, train_data, test_data, pred_ar, i)
-    plot_expand_arma_pred(df_close_log, train_data, test_data, fc_series_arma, lower_series_arma, upper_series_arma, i)
-    plot_expand_arima_pred(df_close_log, train_data, test_data, fc_series_arima, lower_series_arima, upper_series_arima, i)
-    plot_expand_sarima_pred(df_close_log, train_data, test_data, fc_series_sarima, lower_series_sarima, upper_series_sarima, i)
-    plot_expand_hw_pred(df_close_log, train_data, test_data, hw_forecast_series, i)
-
     # Lưu các mô hình
     ex_save_model(model_ar, 'AR', i)
     ex_save_model(model_arma, 'ARMA', i)
@@ -151,7 +150,7 @@ for i, (train_index, test_index) in enumerate(tscv.split(df_close_log)):
 
 # %% In kết quả của từng cửa sổ
 print("\nEvaluation Metrics for Each Window:")
-for i, (mse, rmse, mae) in enumerate(zip(mse_list, rmse_list, mae_list)):
+for i, (mse, rmse) in enumerate(zip(mse_list, rmse_list)):
     print(f"Window {i+1}:")
     print(f"  AR MSE: {mse[0]}, RMSE: {rmse[0]}")
     print(f"  ARMA MSE: {mse[1]}, RMSE: {rmse[1]}")
@@ -160,3 +159,5 @@ for i, (mse, rmse, mae) in enumerate(zip(mse_list, rmse_list, mae_list)):
     print(f"  Holt-Winters MSE: {mse[4]}, RMSE: {rmse[4]}")
 
 print(f"\nBest Window: {best_window_index + 1} with MSE: {best_mse}")
+
+# %%
